@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Чат на веб-сокетах</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            background-color: #f4f4f9;
+        }
+        h1 {
+            color: #333;
+        }
+        #chat {
+            border: 1px solid #ccc;
+            padding: 10px;
+            height: 400px;
+            overflow-y: scroll;
+            margin-bottom: 10px;
+        }
+        input[type="text"] {
+            width: calc(100% - 22px);
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Чат</h1>
+    <div id="chat"></div>
+    <input type="text" id="message" placeholder="Enter message..." />
+    
+    <script>
+        const chat = document.getElementById('chat');
+        const messageInput = document.getElementById('message');
+
+        // Создаем веб-сокет-соединение
+        const ws = new WebSocket('ws://localhost:8080/ws');
+
+        // Обрабатываем входящие сообщения
+        ws.onmessage = function(event) {
+            const message = document.createElement('div');
+            message.textContent = event.data;
+            chat.appendChild(message);
+            chat.scrollTop = chat.scrollHeight; // Прокручиваем вниз, чтобы видеть последние сообщения
+        };
+
+        // Обрабатываем отправку сообщения
+        messageInput.addEventListener('keyup', function(event) {
+            if (event.key === 'Enter') {
+                const message = messageInput.value;
+                if (message) {
+                    ws.send(message);
+                    messageInput.value = ''; // Очищаем поле ввода
+                }
+            }
+        });
+    </script>
+</body>
+</html>
